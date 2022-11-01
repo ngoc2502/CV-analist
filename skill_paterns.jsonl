@@ -253,6 +253,13 @@
 {"label":"SKILL","pattern":[{"LOWER":"business"},{"LOWER":"tools"}]}
 {"label":"SKILL","pattern":[{"TEXT":"C++"}]}
 {"label":"SKILL","pattern":[{"TEXT":"C"}]}
+{"label":"SKILL","pattern":[{"TEXT":"UX/UI"}]}
+{"label":"SKILL","pattern":[{"TEXT":"UI/UX"}]}
+{"label":"SKILL","pattern":[{"LOWER":"vuejs"}]}
+{"label":"SKILL","pattern":[{"LOWER":"ReactJS"}]}
+{"label":"SKILL","pattern":[{"LOWER":"ant design vue"}]}
+{"label":"SKILL","pattern":[{"LOWER":"graphql"}]}
+{"label":"SKILL","pattern":[{"LOWER":"restful api"}]}
 {"label":"SKILL","pattern":[{"LOWER":"c3.js"}]}
 {"label":"SKILL","pattern":[{"LOWER":"c3"},{"LOWER":"js"}]}
 {"label":"SKILL","pattern":[{"LOWER":"caddy"}]}
