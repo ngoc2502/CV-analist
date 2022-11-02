@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <div class="cv">
+        <h1>File CV Uploads</h1>
+        {{msg}}
+        <br>
+        <br>
+        <form action="/home" method='POST' enctype='multipart/form-data'>
+            <input type="file" name="file_name_cv" multiple>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    <br>
+    <br>
+    <div class="jd">
+        <h1>File JD Uploads</h1>
+        {{msg}}
+        <br>
+        <br>
+        <form action="/home" method='POST' enctype='multipart/form-data'>
+            <input type="file" name="file_name_jd">
+            <input type="submit" value="Submit">
+        </form>
+
+    </div>
+
+</body>
+</html>
