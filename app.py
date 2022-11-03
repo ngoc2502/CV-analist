@@ -1,37 +1,38 @@
 from ctypes.wintypes import MSG
 from flask import Flask, render_template, request
 import os
-import extract as e
-# from extract import extract_all_data,extract_pdf,get_path_pdf,cosine_similarity
-# from extract import get_path_pdf
-# from extract import extract_all_data
-# from extract import cosine_similarity
-
+from extract import extract_all_data,extract_pdf,get_path_pdf,cosine_similar
+import json
 
 app = Flask(__name__)
 
 app.config['UPLOAD_FOLDER_CV'] = 'static/files_CV'
 app.config['UPLOAD_FOLDER_JD'] = 'static/files_JD'
 
-path_CV=e.get_path_pdf('./static/files_CV')
-path_JD=e.get_path_pdf('./static/files_JD')
 
-def get_result():
-    path_CV=e.get_path_pdf('./static/files_CV')
-    path_JD=e.get_path_pdf('./static/files_JD')
-
+def get_result():  
+    path_CV=[]
+    path_JD=[]
+    path_CV=get_path_pdf('./static/files_CV')
+    path_JD=get_path_pdf('./static/files_JD')
     list_CV=[]
     for p in path_CV:
-        list_CV.append(e.extract_pdf(p))
+        list_CV.append(extract_pdf(p))
 
-    content_JD=e.extract_pdf(path_JD)
-    df_infor=e.extract_all_data(list_CV)
-    df_match=e.cosine_similarity(list_CV,content_JD)
+    content_JD=''
+    for p in path_JD:
+        content_JD=extract_pdf(p)
+        break
+    df_infor=extract_all_data(list_CV)
+    df_match=cosine_similar(list_CV,content_JD)
 
-    return df_infor.to_html,df_match.to_html
+    return df_match,df_infor
 
 
 @app.route('/', methods=['GET',"POST"])
+def index():
+    return render_template('index.html',msg="Select files to upload")
+
 @app.route('/home', methods=['GET',"POST"])
 def home():
     if request.method=='POST':
@@ -42,14 +43,20 @@ def home():
         f_jd=request.files.get('file_name_jd')
         f_jd.save(os.path.join(app.config['UPLOAD_FOLDER_JD'],f_jd.filename))
         return render_template('index.html',msg="Files has been uploaded successfully")
+    else:
 
-    df_info,df_match=get_result()
-    text_file = open("index.html", "w")
-    text_file.write(df_info)
-    text_file.write(df_match)
-    text_file.close()    
+        df_match,df_infor = get_result()
+        json_match=df_match.to_json(orient="records")
+        json_infor=df_infor.to_json(orient="records")
 
-    return render_template("index.html",msg="Result")
+        parsed_match=json.loads(json_match)
+        parsed_infor=json.loads(json_infor)
+
+        final_match=json.dumps(parsed_match)
+        final_infor =json.dumps(parsed_infor)
+
+        return final_infor,final_match
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True) 
