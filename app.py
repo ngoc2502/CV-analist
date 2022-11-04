@@ -9,7 +9,6 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER_CV'] = 'static/files_CV'
 app.config['UPLOAD_FOLDER_JD'] = 'static/files_JD'
 
-
 def get_result():  
     path_CV=[]
     path_JD=[]
@@ -18,20 +17,18 @@ def get_result():
     list_CV=[]
     for p in path_CV:
         list_CV.append(extract_pdf(p))
-
     content_JD=''
     for p in path_JD:
         content_JD=extract_pdf(p)
         break
-    df_infor=extract_all_data(list_CV)
-    df_match=cosine_similar(list_CV,content_JD)
+    df_infor=extract_all_data(list_CV,content_JD)
 
-    return df_match,df_infor
+    return df_infor
 
 
 @app.route('/', methods=['GET',"POST"])
 def index():
-    return render_template('index.html',msg="Select files to upload")
+    return render_template('index.html',msg="Select files to uploads")
 
 @app.route('/home', methods=['GET',"POST"])
 def home():
@@ -44,18 +41,11 @@ def home():
         f_jd.save(os.path.join(app.config['UPLOAD_FOLDER_JD'],f_jd.filename))
         return render_template('index.html',msg="Files has been uploaded successfully")
     else:
-
-        df_match,df_infor = get_result()
-        json_match=df_match.to_json(orient="records")
+        df_infor = get_result()
         json_infor=df_infor.to_json(orient="records")
-
-        parsed_match=json.loads(json_match)
         parsed_infor=json.loads(json_infor)
-
-        final_match=json.dumps(parsed_match)
         final_infor =json.dumps(parsed_infor)
-
-        return final_infor,final_match
+        return final_infor
 
 
 if __name__ == '__main__':
