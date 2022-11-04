@@ -17,7 +17,6 @@ with jsonlines.open(json_path) as f:
     entities=[line["label"].upper() for line in f.iter()]
 # spacy model
 nlp=spacy.load("en_core_web_lg")
-
 ruler = nlp.add_pipe("entity_ruler")
 ruler.from_disk(json_path)
 
@@ -26,8 +25,7 @@ def extract_pdf(path):
     number_pages=pdf.getNumPages()
     content=''
     for i in range(number_pages):
-        content+=pdf.getPage(i).extractText()
-    
+        content+=pdf.getPage(i).extractText()    
     content=content.replace('\\n','. ').replace('\n\n','. ')
     content=content.replace('\n','. ')
     content=content.replace('\t',' ')   
@@ -198,8 +196,11 @@ def name_acc(train_data):
             similar+=1
     return (similar/len(list_an)*100)
 
-def extract_all_data(list_content_CV):
-    label=['ID','name','email','phone number','related link(git,web,linkedin)','skill','experience','education','GPA']
+def extract_all_data(list_content_CV,content_JD):
+    df_match=cosine_similar(list_content_CV,content_JD)
+    extract_df_match=df_match["Percent_Match_JD"]
+
+    label=['ID','Name','Email','Phone_Number','Related_Link','Skill','Experience','Education','GPA']
 
     df_information = pd.DataFrame(columns=label) 
     # bitbucket
@@ -216,31 +217,37 @@ def extract_all_data(list_content_CV):
         link.append(get_link(linkedin,content))
         row={
                 'ID':i,
-                'name':extract_name(content),
-                'email':get_link(mail,content),
-                'phone number':get_phone(content),
-                'related link(git,web,linkedin)':link,
-                'skill':get_skill(content),
-                'experience':get_experience(content),
-                'education':get_education(content),
+                'Name':extract_name(content),
+                'Email':get_link(mail,content),
+                'Phone_Number':get_phone(content),
+                'Related_Link':link,
+                'Skill':get_skill(content),
+                'Experience':get_experience(content),
+                'Education':get_education(content),
                 'GPA':get_GPA(content)
             }
         new_df=pd.DataFrame([row])
         df_information=pd.concat([df_information,new_df],axis=0,ignore_index=True)
+    df_information=df_information.join(extract_df_match)
+    df_information=df_information.sort_values(by='Percent_Match_JD', ascending=False)
     return df_information
 
 def cosine_similar(list_CV,JD):
-    df_rank_match=pd.DataFrame(columns=['ID','percent match'])
+    df_rank_match=pd.DataFrame(columns=['ID','Percent_Match_JD'])
+    
     for i in range(len(list_CV)):
         test=[list_CV[i],JD]
         cv = CountVectorizer()
         count_matrix= cv.fit_transform(test)
         match= cosine_similarity(count_matrix)
+        
         row = {
             'ID':i,
-            'percent match':match[0][1]
+            'Percent_Match_JD':round(match[0][1]*100,2)
         }
+
         new_df=pd.DataFrame([row])
         df_rank_match=pd.concat([df_rank_match,new_df],axis=0,ignore_index=True)      
+
     return df_rank_match 
 
