@@ -22,7 +22,6 @@ def get_result():
         content_JD=extract_pdf(p)
         break
     df_infor=extract_all_data(list_CV,content_JD)
-
     return df_infor
 
 
@@ -32,13 +31,14 @@ def index():
 
 @app.route('/home', methods=['GET',"POST"])
 def home():
-    if request.method=='POST':
+    if request.method=='POST' :
         for f_cv in request.files.getlist('file_name_cv'):
             f_cv.save(os.path.join(app.config['UPLOAD_FOLDER_CV'],f_cv.filename))
-            return render_template('index.html',msg="Files has been uploaded successfully")
+        
+        if (request.files.get('file_name_jd')):
+            f_jd=request.files.get('file_name_jd')
+            f_jd.save(os.path.join(app.config['UPLOAD_FOLDER_JD'],f_jd.filename))
 
-        f_jd=request.files.get('file_name_jd')
-        f_jd.save(os.path.join(app.config['UPLOAD_FOLDER_JD'],f_jd.filename))
         return render_template('index.html',msg="Files has been uploaded successfully")
     else:
         df_infor = get_result()
