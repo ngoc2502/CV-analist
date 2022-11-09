@@ -11,12 +11,12 @@ from spacy.matcher import Matcher
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-
 json_path="skill_paterns.jsonl"
 with jsonlines.open(json_path) as f:
     entities=[line["label"].upper() for line in f.iter()]
 # spacy model
 nlp=spacy.load("en_core_web_lg")
+
 ruler = nlp.add_pipe("entity_ruler")
 ruler.from_disk(json_path)
 
@@ -26,11 +26,9 @@ def extract_pdf(path):
     content=''
     for i in range(number_pages):
         content+=pdf.getPage(i).extractText()    
-    content=content.replace('\\n','. ').replace('\n\n','. ')
-    content=content.replace('\n','. ')
+    content=content.replace('\n','. ').replace('\n\n','. ')
     content=content.replace('\t',' ')   
     return content
-
 
 def get_path_pdf(path_folder):
     path_pdf=[]
@@ -38,7 +36,6 @@ def get_path_pdf(path_folder):
         for filename in filenames:
             path_pdf.append(os.path.join(dirname,filename))
     return path_pdf
-
 
 def get_skill(content_CV):
     doc=nlp(content_CV)
@@ -96,20 +93,20 @@ def get_education(content_CV):
     edu=''
     pos_edu=-1
     pos_edu_end=-1
+    edu_key=['university','academic','college','institute','bachelor','education']
     for s in sent:
         s_text=s.text.lower()
-        flag=False
-        if s_text.find('education')!=-1 or s_text.find('university')!=-1 or s_text.find('academic')!=-1:
-            edu =s.text
-            if s_text.find('education')!=-1:
-                pos_edu=s_text.find('education')+9
-            if s_text.find('academic') !=-1 :
-                pos_edu=s_text.find('academic')
-            else:
-                pos_edu=s_text.find('university')
-            
-            pos_edu_end=s_text.find('. ',pos_edu)
-            edu=edu[pos_edu:pos_edu_end]
+        for key in edu_key:
+            if s_text.find(key) != -1:
+                edu=s.text
+                if key=='educaiton ':
+                    pos_edu+=9
+                pos_edu=s_text.find(key)
+
+                pos_edu_end=s_text.find('. ',pos_edu)
+                edu=edu[pos_edu:pos_edu_end]
+                print(edu)
+                break
     if edu=='':
         return None
     else:
@@ -135,6 +132,8 @@ def get_phone(content_CV):
     res = ''
     for match in matchs:
         res+=match.group(0)
+        break
+
     if res=='':
         return None
     else:
@@ -150,14 +149,28 @@ def get_link(link,content_CV):
     else:
         return res
 
-
 def extract_name(content_CV):
     matcher = Matcher(nlp.vocab)
     doc=nlp(content_CV)
+    error_key=['city','school','university','freelancer','building']
+    warning_key=['curriculum vita']
+    cut_pos=-1
     for ent in doc.ents:
         if ent.label_=='PERSON':
-            return(ent.text)
-    
+            txt=ent.text
+            txt_lower=txt.lower()
+            flag=True
+            for i in error_key:
+                if i in txt_lower:
+                    flag=False
+            for j in warning_key:
+                if j in txt_lower:
+                    cut_pos=txt_lower.find(j)
+                    txt=txt[:cut_pos]
+            if flag==True:
+                return txt
+            else:
+                break
     # First name and Last name are always Proper Nouns
     pattern = [
         {'POS': 'PROPN'},{'POS': 'PROPN'},
