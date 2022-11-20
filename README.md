@@ -23,3 +23,5 @@ pip install -r /path/to/requirements.txt
 And run app using ```python3 app.py```.
 Now You can check your local link on terminal and get the result.
 
+## Deploy on NGINX server
+# Documentation
