@@ -21,3 +21,4 @@ Or you can also install all packages through requirements.txt file by following
 ```
 pip install -r /path/to/requirements.txt
 ```
+And run app using ```python3 app.py```
