@@ -1,5 +1,5 @@
 # CV-analist
-Visit:[CV-analist](http://cv.uway.asia)
+Visit : [CV-analist](http://cv.uway.asia)
 # Overview
 Extract information from the CV pdf files and matching with the JD file. The higher the percentage score, the better CV fits the JD . The final result will be shown on web, user can dowload as csv file.
 
