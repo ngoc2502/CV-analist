@@ -1,0 +1,23 @@
+# version: '3'
+# services:
+#   web:
+#     build: .
+#     ports:
+#       - "5000:5000"
+#     volumes:
+#       - .:/app
+version: '3.7'
+services:
+  app:
+    build: ./app
+    container_name: app
+    restart: always
+    expose:
+      - 8080
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
